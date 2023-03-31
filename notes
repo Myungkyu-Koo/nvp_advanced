@@ -1,0 +1,25 @@
+[config]
+: NVP-L, NVP-S 각각에 대한
+2D encoding: 'n_levels'($L$), 'n_features_per_level'($C$), 'log2_hashmap_size'(???), 'base_resolution'($H_1, W_1$), 'per_level_scale'($\gamma$)
+3D encoding: 'n_features_per_level'($D$), 'resolution'($H,W,S$)
+등의 hyperparameter 값 정의
+
+[Settings]
+dataio.py -> Training and testing data load
+loss_functions.py -> loss function 정의
+sparsegrid.py modulation.py modules.py -> NVP 정의
+utils.py
+
+[Training]
+training.py
+train_video.py -> Latent code, synthesizer/modulator의 parameter 학습
+  (import dataio.py, utils.py, loss_functions.py, modules.py)
+
+[Evaluation w/o compression]
+eval.py -> latent code quantization & de-quantization, evaluation of the model
+
+[Evaluation w/ compression]
+compression.py -> latent code quantization
+compression.ipynb -> HEVC/JPEG compression of quantized latent codes
+eval_compression.py -> de-quantization of latent code & reconstruction of video
+  (import dataio.py, utils.py, modules.py)
