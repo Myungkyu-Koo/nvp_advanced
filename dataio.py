@@ -79,9 +79,9 @@ class VideoTime(Dataset):
 class VideoTimeWrapper(torch.utils.data.Dataset):
     def __init__(self, dataset, sidelength=None):
 
-        self.dataset = dataset
-        nframes = self.dataset.nframes
-        self.sidelength = sidelength
+        self.dataset = dataset              # class 'dataio.VideoTime'
+        nframes = self.dataset.nframes      # 300
+        self.sidelength = sidelength        # (360, 640)
         
         self.mgrid = get_mgrid(sidelength, dim=2) # [w * h, 3]
 
@@ -89,7 +89,8 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
         self.data = data.view(self.dataset.nframes, -1, self.dataset.channels) # [f, w * h, 3]
 
         # batch 
-        self.N_samples = 1245184 
+        # self.N_samples = 1245184
+        self.pixel_num = 360*640
 
         half_dt =  0.5 / nframes
 
@@ -98,14 +99,30 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
         
         # temporal coords
         self.temporal_coords = torch.linspace(0, 1, nframes)
+        
+        self.epoch = 0
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-
-        temporal_coord_idx = torch.randint(0, self.data.shape[0], (self.N_samples,)) 
-        spatial_coord_idx = torch.randint(0, self.data.shape[1], (self.N_samples,))
+        batch_frames = 5
+        temporal_coord = []
+        for frame in range(batch_frames):
+            temp = torch.full((self.pixel_num,), self.epoch + frame, dtype=torch.int64)
+            temporal_coord.append(temp)
+        temporal_coord_idx = torch.cat(temporal_coord, dim=0)
+        
+        self.epoch += 1
+        if self.epoch == self.dataset.nframes:
+            self.epoch = 0
+        # temporal_coord_idx = torch.randint(0, self.data.shape[0], (self.N_samples,))
+        spatial_coord = []
+        for frame in range(batch_frames):
+            temp = torch.arange(0, self.pixel_num)
+            spatial_coord.append(temp)
+        spatial_coord_idx = torch.cat(spatial_coord, dim=0)
+        # spatial_coord_idx = torch.randint(0, self.data.shape[1], (self.N_samples,))
         data = self.data[temporal_coord_idx, spatial_coord_idx, :] 
         
         spatial_coords = self.mgrid[spatial_coord_idx, :] 

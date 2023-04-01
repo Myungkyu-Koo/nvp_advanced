@@ -27,8 +27,8 @@
         "3d_encoding": {
             "otype": "SparseGrid",
             "n_features_per_level": 2,
-            "x_resolution": 100,
-            "y_resolution": 75,
+            "x_resolution": 120,
+            "y_resolution": 90,
             "t_resolution": 300,
             "upsample": false
         },
