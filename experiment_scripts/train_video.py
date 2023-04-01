@@ -103,7 +103,7 @@ f.write(f"\n - cur bpp: {utils.get_n_params(model)*32/(vid_dataset.vid.shape[0]*
 f.write(f"\n - quantized bpp: {((utils.get_n_params(model))*8+(utils.get_n_params(model.wrapper))*24)/(vid_dataset.vid.shape[0]*vid_dataset.vid.shape[1]*vid_dataset.vid.shape[2])}")
 f.write(f"\n - bpp : {bpp}")
 f.write(f"\n - epochs: {opt.num_epochs}")
-f.write(f"\n - learning rate: {opt.lr}")
+f.write(f"\n - learning rate: {opt.lr}\n")
 f.write("#"*30+" Training Info "+"#"*30)
 f.close()
 

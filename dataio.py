@@ -49,7 +49,7 @@ class VideoTime(Dataset):
                 self.vid = self.vid[0::2]
         else:
             print(" imgs")
-            video_path = os.path.join(path_to_video, "*.png")
+            video_path = os.path.join(path_to_video, "*.jpg")
             files = sorted(glob.glob(video_path))[:self.split_num]
             tmp_img = Image.open(files[0])
             tmp_img  = np.array(tmp_img)

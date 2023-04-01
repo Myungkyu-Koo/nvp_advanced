@@ -1,3 +1,4 @@
+import numpy as np
 from skimage.metrics import structural_similarity as ssim
 
 def image_mse(mask, model_output, gt, loss_type):
@@ -9,6 +10,8 @@ def image_mse(mask, model_output, gt, loss_type):
     else:
         alpha = 0.7
         if mask is None:
-            return {'img_loss': alpha * abs(model_output['model_out']- gt['img']).mean() + (1-alpha) * ssim(model_output['model_out'], gt['img'], multichannel=True)}
+            return {'img_loss': alpha * abs(model_output['model_out']- gt['img']).mean() \
+                    + (1-alpha) * ssim(np.squeeze(model_output['model_out'].detach().cpu().numpy()), np.squeeze(gt['img'].detach().cpu().numpy()), multichannel=True)}
         else:
-            return {'img_loss': alpha * (mask * abs(model_output['model_out']- gt['img'])).mean() + (1-alpha) * ssim(model_output['model_out'], gt['img'], multichannel=True)}
+            return {'img_loss': alpha * (mask * abs(model_output['model_out'] - gt['img'])).mean() \
+                    + (1-alpha) * ssim(np.squeeze(model_output['model_out'].detach().cpu().numpy()), np.squeeze(gt['img'].detach().cpu().numpy()), multichannel=True)}
