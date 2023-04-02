@@ -109,20 +109,22 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
         batch_frames = 5
         temporal_coord = []
         for frame in range(batch_frames):
-            temp = torch.full((self.pixel_num,), self.epoch + frame, dtype=torch.int64)
+            if self.epoch + frame >= self.dataset.nframes:
+                temp = temp = torch.full((self.pixel_num,), self.epoch + frame - self.dataset.nframes, dtype=torch.int64)
+            else: temp = torch.full((self.pixel_num,), self.epoch + frame, dtype=torch.int64)
             temporal_coord.append(temp)
         temporal_coord_idx = torch.cat(temporal_coord, dim=0)
         
         self.epoch += 1
         if self.epoch == self.dataset.nframes:
             self.epoch = 0
-        # temporal_coord_idx = torch.randint(0, self.data.shape[0], (self.N_samples,))
+            
         spatial_coord = []
         for frame in range(batch_frames):
             temp = torch.arange(0, self.pixel_num)
             spatial_coord.append(temp)
         spatial_coord_idx = torch.cat(spatial_coord, dim=0)
-        # spatial_coord_idx = torch.randint(0, self.data.shape[1], (self.N_samples,))
+        
         data = self.data[temporal_coord_idx, spatial_coord_idx, :] 
         
         spatial_coords = self.mgrid[spatial_coord_idx, :] 
@@ -136,3 +138,24 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
         gt_dict = {'img': data}
 
         return in_dict, gt_dict
+
+
+'''
+    def __getitem__(self, idx):
+
+        temporal_coord_idx = torch.randint(0, self.data.shape[0], (self.N_samples,)) 
+        spatial_coord_idx = torch.randint(0, self.data.shape[1], (self.N_samples,))
+        data = self.data[temporal_coord_idx, spatial_coord_idx, :] 
+        
+        spatial_coords = self.mgrid[spatial_coord_idx, :] 
+        temporal_coords = self.temporal_coords[temporal_coord_idx] 
+        
+        temporal_steps = self.temporal_steps[temporal_coord_idx]
+
+        all_coords = torch.cat((temporal_coords.unsqueeze(1), spatial_coords), dim=1)
+            
+        in_dict = {'all_coords': all_coords, "temporal_steps": temporal_steps}
+        gt_dict = {'img': data}
+
+        return in_dict, gt_dict
+'''

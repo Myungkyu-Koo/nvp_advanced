@@ -83,8 +83,13 @@ with open(train_config_save_path, "w") as json_file:
     json.dump(train_config , json_file, indent=4)
 
 # Define the loss
-loss_fn = partial(loss_functions.image_mse, None)
-loss_type = opt.loss_type
+if opt.loss_type == 'L2':
+    loss_fn = partial(loss_functions.image_mse, None)
+elif opt.loss_type == 'L1_SSIM':
+    h = vid_dataset.vid.shape[1]
+    w = vid_dataset.vid.shape[2]
+    c = vid_dataset.vid.shape[3]
+    loss_fn = partial(loss_functions.image_ssim, height = h, width = w, channel = c)
 summary_fn = partial(utils.write_video_time_summary, vid_dataset)
 
 
@@ -114,7 +119,7 @@ f.close()
 
 psnr = training.train(model=model, train_dataloader=dataloader, epochs=opt.num_epochs, lr=opt.lr,
                         steps_til_summary=opt.steps_til_summary, epochs_til_checkpoint=opt.epochs_til_ckpt,
-                        model_dir=root_path, loss_fn=loss_fn, loss_type=loss_type, summary_fn=summary_fn)
+                        model_dir=root_path, loss_fn=loss_fn, summary_fn=summary_fn)
 
 
 f = open(results_file_path, 'a')

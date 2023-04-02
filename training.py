@@ -8,7 +8,7 @@ from tqdm.autonotebook import tqdm
 import numpy as np
 import os
 
-def train(model, train_dataloader, epochs, lr, steps_til_summary, epochs_til_checkpoint, model_dir, loss_fn, loss_type, summary_fn):
+def train(model, train_dataloader, epochs, lr, steps_til_summary, epochs_til_checkpoint, model_dir, loss_fn, summary_fn):
 
     optim = torch.optim.AdamW(lr=lr, params=model.parameters(), weight_decay=0.001)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=epochs, eta_min=1e-5)
@@ -49,7 +49,7 @@ def train(model, train_dataloader, epochs, lr, steps_til_summary, epochs_til_che
 
                 model_output = model(model_input)
 
-                losses = loss_fn(model_output, gt, loss_type)
+                losses = loss_fn(model_output, gt)
                 train_loss = 0.
                 for loss_name, loss in losses.items():
                     single_loss = loss.mean()
