@@ -105,7 +105,7 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, idx):
+    def __getitem__(self):
         batch_frames = 5
         temporal_coord = []
         for frame in range(batch_frames):

@@ -90,6 +90,8 @@ elif opt.loss_type == 'L1_SSIM':
     w = vid_dataset.vid.shape[2]
     c = vid_dataset.vid.shape[3]
     loss_fn = partial(loss_functions.image_ssim, height = h, width = w, channel = c)
+else:
+    raise NotImplementedError("Loss function %s is not existing"%opt.loss_type)
 summary_fn = partial(utils.write_video_time_summary, vid_dataset)
 
 
