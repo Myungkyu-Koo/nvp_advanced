@@ -55,16 +55,16 @@ class NVP(nn.Module):
         timesteps = timesteps.reshape(b*t, -1)
 
         all_coords = model_input['all_coords']
-        all_coords = all_coords.view(-1, 3) # t, x, y
+        all_coords = all_coords.view(-1, 3) # t, x, y of a batch
 
         # keyframes
-        xy_coords = all_coords[:, [1, 2]]
-        xt_coords = all_coords[:, [0, 1]]
-        yt_coords = all_coords[:, [0, 2]]
+        xy_coords = all_coords[:, [1, 2]] # x, y
+        xt_coords = all_coords[:, [0, 1]] # t, x
+        yt_coords = all_coords[:, [0, 2]] # t, y
 
-        spatial_embedding_xy = self.keyframes_xy(xy_coords)
+        spatial_embedding_xy = self.keyframes_xy(xy_coords) # [5*360*640, layer * C]
         spatial_embedding_xt = self.keyframes_xt(xt_coords)
-        spatial_embedding_yt = self.keyframes_yt(yt_coords) 
+        spatial_embedding_yt = self.keyframes_yt(yt_coords)
 
         spatial_embedding = torch.cat((spatial_embedding_xy, spatial_embedding_yt, spatial_embedding_xt), dim=1)
 

@@ -7,10 +7,9 @@ def image_mse(mask, model_output, gt):
     else:
         return {'img_loss': (mask * (model_output['model_out'] - gt['img']) ** 2).mean()}
             
-def image_ssim(mask, model_output, gt, height, width, channel=3):
+def image_ssim(mask, model_output, gt, height, width, channel=3):       # model_output['model_out'], gt['img'] -> Shape: [1, 5*height*width, channel]
     alpha = 0.7
     output = model_output['model_out'].squeeze().view(-1, height, width, channel).permute(0, 3, 1, 2)      # Shape: [5, channel, height, width]
-    print(f"*******gt['img'] shape: {gt['img'].shape}*******")
     target = gt['img'].squeeze().view(-1, height, width, channel).permute(0, 3, 1, 2)
     
     if mask is None:

@@ -83,7 +83,7 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
         nframes = self.dataset.nframes      # 300
         self.sidelength = sidelength        # (360, 640)
         
-        self.mgrid = get_mgrid(sidelength, dim=2) # [w * h, 3]
+        self.mgrid = get_mgrid(sidelength, dim=2) # [w * h, 2] in range [0, 1] ((0, 0) to (1, 1))
 
         data = torch.from_numpy(self.dataset[0])
         self.data = data.view(self.dataset.nframes, -1, self.dataset.channels) # [f, w * h, 3]
@@ -105,7 +105,7 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self):
+    def __getitem__(self, idx):
         batch_frames = 5
         temporal_coord = []
         for frame in range(batch_frames):
@@ -123,16 +123,16 @@ class VideoTimeWrapper(torch.utils.data.Dataset):
         for frame in range(batch_frames):
             temp = torch.arange(0, self.pixel_num)
             spatial_coord.append(temp)
-        spatial_coord_idx = torch.cat(spatial_coord, dim=0)
+        spatial_coord_idx = torch.cat(spatial_coord, dim=0) # spatial coordinate in index / (0, 1, ..., 360*640-1) * 5 times
         
-        data = self.data[temporal_coord_idx, spatial_coord_idx, :] 
+        data = self.data[temporal_coord_idx, spatial_coord_idx, :] # [t, (x,y), rgb]
         
-        spatial_coords = self.mgrid[spatial_coord_idx, :] 
-        temporal_coords = self.temporal_coords[temporal_coord_idx] 
+        spatial_coords = self.mgrid[spatial_coord_idx, :]  # spatial coordinates / ((0, 0), ..., (1, 1)) * 5 times
+        temporal_coords = self.temporal_coords[temporal_coord_idx] # Frame index in [0, 1]
         
-        temporal_steps = self.temporal_steps[temporal_coord_idx]
+        temporal_steps = self.temporal_steps[temporal_coord_idx] # temporal steps in sec.
 
-        all_coords = torch.cat((temporal_coords.unsqueeze(1), spatial_coords), dim=1)
+        all_coords = torch.cat((temporal_coords.unsqueeze(1), spatial_coords), dim=1) # (frame, (x, y)) * (360*640)
             
         in_dict = {'all_coords': all_coords, "temporal_steps": temporal_steps}
         gt_dict = {'img': data}

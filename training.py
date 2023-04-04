@@ -49,7 +49,7 @@ def train(model, train_dataloader, epochs, lr, steps_til_summary, epochs_til_che
 
                 model_output = model(model_input)   # Shape: [1, 5*360*640, 3]
 
-                losses = loss_fn(None, model_output, gt)
+                losses = loss_fn(model_output, gt)
                 train_loss = 0.
                 for loss_name, loss in losses.items():
                     single_loss = loss.mean()
